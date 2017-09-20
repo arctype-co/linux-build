@@ -12,7 +12,7 @@ linux/.git:
 
 linux/.config: linux/.git
 	make -C linux ARCH=arm64 CROSS_COMPILE="ccache aarch64-linux-gnu-" clean CONFIG_ARCH_SUN50IW1P1=y
-	make -C linux ARCH=arm64 CROSS_COMPILE="ccache aarch64-linux-gnu-" sun50iw1p1smp_linux_defconfig
+	make -C linux ARCH=arm64 CROSS_COMPILE="ccache aarch64-linux-gnu-" sun50iw1p1smp_linux_arctype_defconfig
 	touch linux/.config
 
 linux/arch/arm64/boot/Image: linux/.config
