@@ -2,13 +2,13 @@ export RELEASE_NAME ?= 0.1~dev
 export RELEASE ?= 1
 export LINUX_BRANCH ?= my-hacks-1.2-with-mmc3
 export BOOT_TOOLS_BRANCH ?= with-drm-mmc3
-LINUX_LOCALVERSION ?= -ayufan-$(RELEASE)
+LINUX_LOCALVERSION ?= -arctype-$(RELEASE)
 
 all: linux-pinebook linux-pine64 linux-sopine
 
 linux/.git:
 	git clone --depth=1 --branch=$(LINUX_BRANCH) --single-branch \
-		https://github.com/ayufan-pine64/linux-pine64.git linux
+		https://github.com/arctype-co/linux-pine64.git linux
 
 linux/.config: linux/.git
 	make -C linux ARCH=arm64 CROSS_COMPILE="ccache aarch64-linux-gnu-" clean CONFIG_ARCH_SUN50IW1P1=y
