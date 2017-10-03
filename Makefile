@@ -200,3 +200,11 @@ zesty-minimal-sopine: zesty-minimal-sopine-bspkernel-$(RELEASE_NAME)-$(RELEASE).
 
 .PHONY: linux-sopine
 linux-sopine: simple-image-sopine zesty-minimal-sopine xenial-minimal-sopine stretch-minimal-sopine jessie-minimal-sopine
+
+.PHONY: vmlinux
+vmlinux:
+	make -C linux ARCH=arm64 CROSS_COMPILE="ccache aarch64-linux-gnu-" -j4 LOCALVERSION=$(LINUX_LOCALVERSION) vmlinux
+
+.PHONY: image
+image:
+	make -C linux ARCH=arm64 CROSS_COMPILE="ccache aarch64-linux-gnu-" -j4 LOCALVERSION=$(LINUX_LOCALVERSION) Image
