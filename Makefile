@@ -1,5 +1,5 @@
 export RELEASE_NAME ?= 0.1~dev
-export RELEASE ?= 1
+export RELEASE ?= 3
 export LINUX_BRANCH ?= master
 export BOOT_TOOLS_BRANCH ?= with-drm-mmc3
 LINUX_LOCALVERSION ?= -arctype-$(RELEASE)
@@ -18,7 +18,7 @@ linux/.config: linux/.git
 linux/arch/arm64/boot/Image: linux/.config
 	make -C linux ARCH=arm64 CROSS_COMPILE="ccache aarch64-linux-gnu-" -j4 LOCALVERSION=$(LINUX_LOCALVERSION) Image
 	make -C linux ARCH=arm64 CROSS_COMPILE="ccache aarch64-linux-gnu-" -j4 LOCALVERSION=$(LINUX_LOCALVERSION) modules
-	make -C linux LOCALVERSION=$(LINUX_LOCALVERSION) M=modules/gpu/mali400/kernel_mode/driver/src/devicedrv/mali \
+	#make -C linux LOCALVERSION=$(LINUX_LOCALVERSION) M=modules/gpu/mali400/kernel_mode/driver/src/devicedrv/mali \
 		ARCH=arm64 CROSS_COMPILE="ccache aarch64-linux-gnu-" \
 		CONFIG_MALI400=m CONFIG_MALI450=y CONFIG_MALI400_PROFILING=y \
 		CONFIG_MALI_DMA_BUF_MAP_ON_ATTACH=y CONFIG_MALI_DT=y \
