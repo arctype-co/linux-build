@@ -6,11 +6,11 @@ LINUX_LOCALVERSION ?= -arctype-$(RELEASE)
 
 all: linux-pinebook linux-pine64 linux-sopine
 
-linux/.git:
+linux:
 	git clone --depth=1 --branch=$(LINUX_BRANCH) --single-branch \
 		https://github.com/arctype-co/linux-pine64.git linux
 
-linux/.config: linux/.git
+linux/.config: | linux
 	make -C linux ARCH=arm64 CROSS_COMPILE="ccache aarch64-linux-gnu-" clean CONFIG_ARCH_SUN50IW1P1=y
 	make -C linux ARCH=arm64 CROSS_COMPILE="ccache aarch64-linux-gnu-" sun50iw1p1smp_linux_arctype_defconfig
 	touch linux/.config
