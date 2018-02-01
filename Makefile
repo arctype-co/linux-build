@@ -76,19 +76,19 @@ linux-pine64-package-$(RELEASE_NAME).deb: package package/rtk_bt/rtk_hciattach/r
 %.img.xz: %.img
 	pxz -f -3 $<
 
-simple-image-pine64-$(RELEASE_NAME).img: linux-pine64-$(RELEASE_NAME).tar.xz boot-tools
+simple-image-pine64-$(RELEASE_NAME).img: | linux-pine64-$(RELEASE_NAME).tar.xz boot-tools
 	cd simpleimage && \
 		export boot0=../boot-tools/boot/pine64/boot0-pine64-plus.bin && \
 		export uboot=../boot-tools/boot/pine64/u-boot-pine64-plus.bin && \
 		bash ./make_simpleimage.sh $(shell readlink -f "$@") 150 $(shell readlink -f linux-pine64-$(RELEASE_NAME).tar.xz)
 
-simple-image-sopine-$(RELEASE_NAME).img: linux-pine64-$(RELEASE_NAME).tar.xz boot-tools
+simple-image-sopine-$(RELEASE_NAME).img: | linux-pine64-$(RELEASE_NAME).tar.xz boot-tools
 	cd simpleimage && \
 		export boot0=../boot-tools/boot/pine64/boot0-pine64-sopine.bin && \
 		export uboot=../boot-tools/boot/pine64/u-boot-pine64-sopine.bin && \
 		bash ./make_simpleimage.sh $(shell readlink -f "$@") 150 $(shell readlink -f linux-pine64-$(RELEASE_NAME).tar.xz)
 
-simple-image-pinebook-$(RELEASE_NAME).img: linux-pine64-$(RELEASE_NAME).tar.xz boot-tools
+simple-image-pinebook-$(RELEASE_NAME).img: | linux-pine64-$(RELEASE_NAME).tar.xz boot-tools
 	cd simpleimage && \
 		export boot0=../boot-tools/boot/pine64/boot0-pine64-pinebook.bin && \
 		export uboot=../boot-tools/boot/pine64/u-boot-pine64-pinebook.bin && \
