@@ -4,7 +4,7 @@ export LINUX_BRANCH ?= master
 export BOOT_TOOLS_BRANCH ?= with-drm-mmc3
 LINUX_LOCALVERSION ?= -arctype-$(RELEASE)
 
-all: linux-pinebook linux-pine64 linux-sopine
+all: linux-pine64
 
 linux/.config:
 	make -C linux ARCH=arm64 CROSS_COMPILE="ccache aarch64-linux-gnu-" clean CONFIG_ARCH_SUN50IW1P1=y
@@ -72,38 +72,21 @@ linux-pine64-package-$(RELEASE_NAME).deb: package package/rtk_bt/rtk_hciattach/r
 %.img.xz: %.img
 	pxz -f -3 $<
 
-simple-image-pine64-$(RELEASE_NAME).img: | linux-pine64-$(RELEASE_NAME).tar.xz boot-tools
+simple-image-pine64-$(RELEASE_NAME).img: boot-tools
 	cd simpleimage && \
 		export boot0=../boot-tools/boot/pine64/boot0-pine64-plus.bin && \
 		export uboot=../boot-tools/boot/pine64/u-boot-pine64-plus.bin && \
 		bash ./make_simpleimage.sh $(shell readlink -f "$@") 150 $(shell readlink -f linux-pine64-$(RELEASE_NAME).tar.xz)
 
-simple-image-sopine-$(RELEASE_NAME).img: | linux-pine64-$(RELEASE_NAME).tar.xz boot-tools
-	cd simpleimage && \
-		export boot0=../boot-tools/boot/pine64/boot0-pine64-sopine.bin && \
-		export uboot=../boot-tools/boot/pine64/u-boot-pine64-sopine.bin && \
-		bash ./make_simpleimage.sh $(shell readlink -f "$@") 150 $(shell readlink -f linux-pine64-$(RELEASE_NAME).tar.xz)
-
-simple-image-pinebook-$(RELEASE_NAME).img: | linux-pine64-$(RELEASE_NAME).tar.xz boot-tools
-	cd simpleimage && \
-		export boot0=../boot-tools/boot/pine64/boot0-pine64-pinebook.bin && \
-		export uboot=../boot-tools/boot/pine64/u-boot-pine64-pinebook.bin && \
-		bash ./make_simpleimage.sh $(shell readlink -f "$@") 150 $(shell readlink -f linux-pine64-$(RELEASE_NAME).tar.xz)
-
-BUILD_SYSTEMS := xenial zesty jessie stretch
-BUILD_VARIANTS := minimal mate i3 openmediavault
+BUILD_SYSTEMS := xenial
+BUILD_VARIANTS := minimal
 BUILD_ARCHS := arm64
-BUILD_MODELS := pine64 pinebook sopine
+BUILD_MODELS := pine64
 
 %-$(RELEASE_NAME)-$(RELEASE).img.xz: %-$(RELEASE_NAME)-$(RELEASE).img
 	pxz -f -3 $<
 
-%-$(RELEASE_NAME)-$(RELEASE).img:	| simple-image-pine64-$(RELEASE_NAME).img.xz \
-									simple-image-pinebook-$(RELEASE_NAME).img.xz \
-									simple-image-sopine-$(RELEASE_NAME).img.xz \
-									linux-pine64-$(RELEASE_NAME).tar.xz \
-									linux-pine64-package-$(RELEASE_NAME).deb \
-									boot-tools
+%-$(RELEASE_NAME)-$(RELEASE).img: boot-tools
 	sudo bash ./build-pine64-image.sh \
 		"$(shell readlink -f $@)" \
 		"$(shell readlink -f simple-image-$(filter $(BUILD_MODELS), $(subst -, ,$@))-$(RELEASE_NAME).img.xz)" \
@@ -119,83 +102,16 @@ kernel-tarball: linux-pine64-$(RELEASE_NAME).tar.xz
 .PHONY: linux-package
 linux-package: linux-pine64-package-$(RELEASE_NAME).deb
 
-simple-image-pinebook: simple-image-pinebook-$(RELEASE_NAME).img.xz
-
 simple-image-pine64: simple-image-pine64-$(RELEASE_NAME).img.xz
-
-simple-image-sopine: simple-image-sopine-$(RELEASE_NAME).img.xz
 
 .PHONY: simple-image
 simple-image: simple-image-pinebook simple-image-pine64 simple-image-sopine
-
-.PHONY: zesty-minimal-pinebook
-zesty-minimal-pinebook: zesty-minimal-pinebook-bspkernel-$(RELEASE_NAME)-$(RELEASE).img.xz
-
-.PHONY: xenial-mate-pinebook
-zesty-mate-pinebook: zesty-mate-pinebook-bspkernel-$(RELEASE_NAME)-$(RELEASE).img.xz
-
-.PHONY: xenial-i3-pinebook
-zesty-i3-pinebook: zesty-i3-pinebook-bspkernel-$(RELEASE_NAME)-$(RELEASE).img.xz
-
-.PHONY: xenial-minimal-pinebook
-xenial-minimal-pinebook: xenial-minimal-pinebook-bspkernel-$(RELEASE_NAME)-$(RELEASE).img.xz
-
-.PHONY: xenial-mate-pinebook
-xenial-mate-pinebook: xenial-mate-pinebook-bspkernel-$(RELEASE_NAME)-$(RELEASE).img.xz
-
-.PHONY: xenial-i3-pinebook
-xenial-i3-pinebook: xenial-i3-pinebook-bspkernel-$(RELEASE_NAME)-$(RELEASE).img.xz
-
-.PHONY: stretch-minimal-pine64
-stretch-minimal-pine64: stretch-minimal-pine64-bspkernel-$(RELEASE_NAME)-$(RELEASE).img.xz
-
-.PHONY: stretch-minimal-sopine
-stretch-minimal-sopine: stretch-minimal-sopine-bspkernel-$(RELEASE_NAME)-$(RELEASE).img.xz
-
-.PHONY: stretch-minimal-pinebook
-stretch-minimal-pinebook: stretch-minimal-pinebook-bspkernel-$(RELEASE_NAME)-$(RELEASE).img.xz
-
-.PHONY: jessie-minimal-pinebook
-jessie-minimal-pinebook: jessie-minimal-pinebook-$(RELEASE_NAME)-$(RELEASE).img.xz
-
-.PHONY: jessie-minimal-sopine
-jessie-minimal-sopine: jessie-minimal-sopine-$(RELEASE_NAME)-$(RELEASE).img.xz
-
-.PHONY: jessie-minimal-pine64
-jessie-minimal-pine64: jessie-minimal-pine64-$(RELEASE_NAME)-$(RELEASE).img.xz
-
-.PHONY: jessie-openmediavault-pine64
-jessie-openmediavault-pine64: jessie-openmediavault-pine64-$(RELEASE_NAME)-$(RELEASE).img.xz
-
-.PHONY: zesty-pinebook
-zesty-pinebook: zesty-minimal-pinebook zesty-mate-pinebook zesty-i3-pinebook
-
-.PHONY: xenial-pinebook
-xenial-pinebook: xenial-minimal-pinebook xenial-mate-pinebook xenial-i3-pinebook
-
-.PHONY: stretch-pinebook
-stretch-pinebook: stretch-minimal-pinebook
-
-.PHONY: linux-pinebook
-linux-pinebook: simple-image-pinebook xenial-pinebook stretch-pinebook jessie-minimal-pinebook
-
-.PHONY: zesty-minimal-pine64
-zesty-minimal-pine64: zesty-minimal-pine64-bspkernel-$(RELEASE_NAME)-$(RELEASE).img.xz
 
 .PHONY: xenial-minimal-pine64
 xenial-minimal-pine64: xenial-minimal-pine64-bspkernel-$(RELEASE_NAME)-$(RELEASE).img.xz
 
 .PHONY: linux-pine64
-linux-pine64: simple-image-pine64 zesty-minimal-pine64 xenial-minimal-pine64 stretch-minimal-pine64 jessie-minimal-pine64
-
-.PHONY: zesty-minimal-sopine
-zesty-minimal-sopine: zesty-minimal-sopine-bspkernel-$(RELEASE_NAME)-$(RELEASE).img.xz
-
-.PHONY: xenial-minimal-sopine
- xenial-minimal-sopine: xenial-minimal-sopine-bspkernel-$(RELEASE_NAME)-$(RELEASE).img.xz
-
-.PHONY: linux-sopine
-linux-sopine: simple-image-sopine zesty-minimal-sopine xenial-minimal-sopine stretch-minimal-sopine jessie-minimal-sopine
+linux-pine64: simple-image-pine64 xenial-minimal-pine64
 
 .PHONY: vmlinux
 vmlinux:
